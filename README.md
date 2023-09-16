@@ -1,78 +1,19 @@
-Docker MySQL master-slave replication 
-========================
+# Setup
 
-MySQL 8.0 master-slave replication with using Docker. 
+The repo is forked from https://github.com/vbabak/docker-mysql-master-slave
 
-Previous version based on MySQL 5.7 is available in [mysql5.7](https://github.com/vbabak/docker-mysql-master-slave/tree/mysql5.7) branch.
+to launch the replicas, execute:
 
-## Run
-
-To run this examples you will need to start containers with "docker-compose" 
-and after starting setup replication. See commands inside ./build.sh. 
-
-#### Create 2 MySQL containers with master-slave row-based replication 
-
-```bash
-./build.sh
+```
+sudo ./build.sh
 ```
 
-#### Make changes to master
+This will create 3 replicas of a master.
 
-```bash
-docker exec mysql_master sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'create table code(code int); insert into code values (100), (200)'"
-```
+# Results
 
-#### Read changes from slave
-
-```bash
-docker exec mysql_slave sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'select * from code \G'"
-```
-
-## Troubleshooting
-
-#### Check Logs
-
-```bash
-docker-compose logs
-```
-
-#### Start containers in "normal" mode
-
-> Go through "build.sh" and run command step-by-step.
-
-#### Check running containers
-
-```bash
-docker-compose ps
-```
-
-#### Clean data dir
-
-```bash
-rm -rf ./master/data/*
-rm -rf ./slave/data/*
-```
-
-#### Run command inside "mysql_master"
-
-```bash
-docker exec mysql_master sh -c 'mysql -u root -p111 -e "SHOW MASTER STATUS \G"'
-```
-
-#### Run command inside "mysql_slave"
-
-```bash
-docker exec mysql_slave sh -c 'mysql -u root -p111 -e "SHOW SLAVE STATUS \G"'
-```
-
-#### Enter into "mysql_master"
-
-```bash
-docker exec -it mysql_master bash
-```
-
-#### Enter into "mysql_slave"
-
-```bash
-docker exec -it mysql_slave bash
-```
+1. Stopping the slave:
+```docker stop slave1```
+I've tried to test the insert speed, same as the replication outcome - it seems to me it had no visible effect. The replication continues fine, as expected.
+2. Deleting the last column: kinda no effect on replication. "kinda" since you actually have different data on slaves, which brings you inconsistencies while reading, although the replication per se works fine.
+3. Delete the column in the middle: breaks the replication on a given slave, although I don't see errors from its container. The reason for fail is the broken order of columns - and that differentiates this case from deleting a column from the end.
