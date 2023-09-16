@@ -1,0 +1,6 @@
+echo "slave 1"
+docker exec slave1 sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'select * from users'"
+#echo "slave 2"
+#docker exec slave2 sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'select * from users'"
+#echo "slave 3"
+#docker exec slave3 sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'select * from users'"

@@ -4,21 +4,22 @@ services:
     image: mysql:8.0
     env_file:
       - ./master/mysql_master.env
-    container_name: "mysql_master"
+    container_name: "master"
     restart: "no"
     ports:
       - 4406:3306
     volumes:
+      #- ./var/run/docker.sock:/var/run/mysqld/mysqld.sock
       - ./master/conf/mysql.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf
       - ./master/data:/var/lib/mysql
-    networks:
-      - overlay
+#    networks:
+#      - overlay
 
-  mysql_slave:
+  mysql_slave_1:
     image: mysql:8.0
     env_file:
       - ./slave/mysql_slave.env
-    container_name: "mysql_slave"
+    container_name: "slave1"
     restart: "no"
     ports:
       - 5506:3306
@@ -26,10 +27,41 @@ services:
       - mysql_master
     volumes:
       - ./slave/conf/mysql.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf
-      - ./slave/data:/var/lib/mysql
-    networks:
-      - overlay
+      - ./slave/data1:/var/lib/mysql
+#    networks:
+#      - overlay
 
-networks:
-  overlay:
+  mysql_slave_2:
+    image: mysql:8.0
+    env_file:
+      - ./slave/mysql_slave.env
+    container_name: "slave2"
+    restart: "no"
+    ports:
+      - 6606:3306
+    depends_on:
+      - mysql_master
+    volumes:
+      - ./slave/conf/mysql.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf
+      - ./slave/data2:/var/lib/mysql
+#    networks:
+#      - overlay
+
+  mysql_slave_3:
+    image: mysql:8.0
+    env_file:
+      - ./slave/mysql_slave.env
+    container_name: "slave3"
+    restart: "no"
+    ports:
+      - 7706:3306
+    depends_on:
+      - mysql_master
+    volumes:
+      - ./slave/conf/mysql.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf
+      - ./slave/data3:/var/lib/mysql
+    #networks:
+    #  - overlay
+#networks:
+#  overlay:
 
